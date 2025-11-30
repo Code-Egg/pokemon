@@ -6,10 +6,11 @@ import { getValidMoveTarget } from '../utils/puzzle';
 interface BoardProps {
   state: PuzzleState;
   imageUrl: string;
+  color: string;
   onMove: (newTiles: number[]) => void;
 }
 
-export const Board: React.FC<BoardProps> = ({ state, imageUrl, onMove }) => {
+export const Board: React.FC<BoardProps> = ({ state, imageUrl, color, onMove }) => {
   const { tiles, gridSize, isSolved } = state;
 
   const handleTileClick = (index: number) => {
@@ -47,6 +48,7 @@ export const Board: React.FC<BoardProps> = ({ state, imageUrl, onMove }) => {
               index={index}
               gridSize={gridSize}
               imageUrl={imageUrl}
+              color={color}
               isEmpty={isEmpty}
               isSolved={isSolved}
               onClick={() => handleTileClick(index)}

@@ -6,6 +6,7 @@ interface TileProps {
   index: number;
   gridSize: number;
   imageUrl: string;
+  color: string;
   isEmpty: boolean;
   onClick: () => void;
   isSolved: boolean;
@@ -16,6 +17,7 @@ export const Tile: React.FC<TileProps> = ({
   index,
   gridSize,
   imageUrl,
+  color,
   isEmpty,
   onClick,
   isSolved,
@@ -41,12 +43,14 @@ export const Tile: React.FC<TileProps> = ({
       layout
       transition={{ type: "spring", stiffness: 300, damping: 25 }}
       onClick={onClick}
-      className={`relative w-full h-full overflow-hidden rounded-md shadow-sm border border-white/20 hover:brightness-110 active:scale-95 transition-all ${isEmpty && isSolved ? 'opacity-100' : ''}`}
+      // Apply the color class (e.g., bg-yellow-400) directly to the button
+      className={`relative w-full h-full overflow-hidden rounded-md shadow-sm border border-white/20 hover:brightness-110 active:scale-95 transition-all ${color} ${isEmpty && isSolved ? 'opacity-100' : ''}`}
       style={{
-        // If it's the "empty" tile shown at the end, use the last ID
-        background: `url(${imageUrl})`,
+        // Use backgroundImage instead of background to allow the CSS class background-color to show through
+        backgroundImage: `url(${imageUrl})`,
         backgroundSize: `${gridSize * 100}%`,
         backgroundPosition: `${bgPosX}% ${bgPosY}%`,
+        backgroundRepeat: 'no-repeat',
         zIndex: isEmpty ? 0 : 1
       }}
       disabled={isSolved && !isEmpty}

@@ -51,9 +51,6 @@ const App: React.FC = () => {
 
   const handlePokemonSelect = (pokemon: Pokemon) => {
     setSelectedPokemon(pokemon);
-    // Optional: Reset game when pokemon changes? 
-    // Usually better UX to keep the puzzle but change image, but for logic simplicity usually a reset is cleaner visually.
-    // Let's reset to ensure the image matches perfectly.
     startNewGame(gridSize);
   };
 
@@ -63,23 +60,25 @@ const App: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-900 flex flex-col items-center justify-start py-8 px-4 sm:justify-center overflow-y-auto">
+    // Changed container to min-h-screen and standard flow to allow native scrolling
+    <div className="min-h-screen bg-slate-900 flex flex-col items-center py-6 px-4">
       
       {/* Header */}
-      <div className="mb-8 text-center space-y-2">
-        <h1 className="text-4xl md:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 via-red-500 to-pink-500 tracking-tight flex items-center justify-center gap-3">
-          <Sparkles className="text-yellow-400" />
+      <div className="mb-6 text-center space-y-1">
+        <h1 className="text-3xl sm:text-4xl md:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 via-red-500 to-pink-500 tracking-tight flex items-center justify-center gap-2">
+          <Sparkles className="text-yellow-400 w-6 h-6 sm:w-8 sm:h-8" />
           PokéPuzzle
         </h1>
-        <p className="text-slate-400 font-medium">Slide to solve the challenge!</p>
+        <p className="text-slate-400 text-sm sm:text-base font-medium">Slide to solve the challenge!</p>
       </div>
 
       {/* Main Game Area */}
-      <div className="w-full flex flex-col items-center gap-8 animate-fade-in-up">
+      <div className="w-full flex flex-col items-center gap-6 animate-fade-in-up flex-grow">
         
         <Board 
           state={gameState} 
           imageUrl={selectedPokemon.imageUrl} 
+          color={selectedPokemon.color}
           onMove={handleMove} 
         />
 
@@ -95,8 +94,8 @@ const App: React.FC = () => {
       </div>
 
       {/* Footer */}
-      <footer className="mt-12 text-slate-600 text-sm">
-        <p>Challenge yourself with {gridSize}x{gridSize} grid!</p>
+      <footer className="mt-4 pb-4 text-slate-600 text-xs sm:text-sm text-center">
+        <p>Challenge yourself with {gridSize}x{gridSize} grid ({gridSize*gridSize} tiles)!</p>
       </footer>
     </div>
   );
