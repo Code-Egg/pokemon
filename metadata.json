@@ -1,0 +1,5 @@
+{
+  "name": "PokéPuzzle Challenge",
+  "description": "A responsive sliding tile puzzle game featuring Pikachu, Grookey, and Mewtwo. Optimized for mobile with smooth animations.",
+  "requestFramePermissions": []
+}
