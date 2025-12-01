@@ -1,58 +1,72 @@
 import React from 'react';
 import { POKEMON_LIST } from '../constants';
 import { Pokemon, GridSize } from '../types';
-import { RefreshCw } from 'lucide-react';
+import { RefreshCw, Grid3x3, Grid, Box, Eye, EyeOff } from 'lucide-react';
 
 interface ControlsProps {
   currentPokemon: Pokemon;
-  moves: number;
   onSelectPokemon: (pokemon: Pokemon) => void;
   onReset: () => void;
   gridSize: number;
   onResize: (size: GridSize) => void;
-  isSolved: boolean;
+  showHint: boolean;
+  onToggleHint: () => void;
 }
 
 export const Controls: React.FC<ControlsProps> = ({
   currentPokemon,
-  moves,
   onSelectPokemon,
   onReset,
   gridSize,
   onResize,
-  isSolved
+  showHint,
+  onToggleHint
 }) => {
   return (
     <div className="flex flex-col gap-4 w-full max-w-md pb-8">
-      {/* Stats and Controls */}
-      <div className="flex flex-col gap-2 bg-slate-800/80 p-3 rounded-2xl border border-slate-700 shadow-lg backdrop-blur">
-        <div className="flex items-center justify-between">
-          <div className="flex flex-col">
-            <span className="text-slate-400 text-[10px] uppercase tracking-wider font-bold">Moves</span>
-            <span className="text-xl font-bold font-mono text-white leading-none">{moves}</span>
+      {/* Grid Size & Reset */}
+      <div className="bg-slate-800/80 p-3 rounded-2xl border border-slate-700 shadow-lg backdrop-blur">
+        <div className="flex items-center justify-between mb-3">
+          <span className="text-slate-400 text-xs font-bold uppercase tracking-wider">Difficulty</span>
+          
+          <div className="flex items-center gap-2">
+            <button 
+              onClick={onToggleHint}
+              className={`flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-bold transition-colors ${
+                showHint ? 'bg-indigo-600 text-white hover:bg-indigo-500' : 'bg-slate-700 text-slate-400 hover:bg-slate-600'
+              }`}
+            >
+              {showHint ? <Eye size={14} /> : <EyeOff size={14} />}
+              {showHint ? 'Hint On' : 'Hint Off'}
+            </button>
+            <button 
+              onClick={onReset}
+              className="flex items-center gap-1 px-3 py-1.5 bg-slate-700 hover:bg-slate-600 rounded-lg text-xs font-bold text-white transition-colors"
+            >
+              <RefreshCw size={14} />
+              Reset
+            </button>
           </div>
-          <button 
-            onClick={onReset}
-            className="p-2 bg-slate-700 hover:bg-slate-600 active:bg-slate-500 rounded-xl text-white transition-colors shadow-lg"
-            title="Shuffle Board"
-          >
-            <RefreshCw size={20} />
-          </button>
         </div>
-
-        {/* Grid Size Selectors */}
-        <div className="grid grid-cols-4 gap-2 mt-1">
-           {[3, 4, 5, 8].map((size) => (
+        
+        <div className="grid grid-cols-4 gap-2">
+           {[
+             { size: 3, label: '9 Pcs', icon: Grid3x3 }, 
+             { size: 4, label: '16 Pcs', icon: Grid }, 
+             { size: 5, label: '25 Pcs', icon: Box },
+             { size: 8, label: '64 Pcs', icon: Box },
+           ].map((opt) => (
              <button 
-              key={size}
-              onClick={() => onResize(size as GridSize)}
-              className={`py-1.5 px-1 rounded-lg transition-all text-center ${
-                gridSize === size 
-                  ? 'bg-blue-500 text-white shadow-md scale-105 font-bold' 
+              key={opt.size}
+              onClick={() => onResize(opt.size as GridSize)}
+              className={`py-2 px-1 rounded-lg transition-all text-center flex flex-col items-center justify-center gap-1 ${
+                gridSize === opt.size 
+                  ? 'bg-blue-600 text-white shadow-md ring-2 ring-blue-400/50' 
                   : 'bg-slate-700 text-slate-400 hover:bg-slate-600'
               }`}
             >
-              <span className="text-xs">{size}x{size}</span>
+              <opt.icon size={16} />
+              <span className="text-[10px] font-bold">{opt.label}</span>
             </button>
            ))}
         </div>
@@ -83,7 +97,7 @@ export const Controls: React.FC<ControlsProps> = ({
                   }`}
                 />
               </div>
-              <span className={`text-xs font-bold uppercase tracking-wider ${
+              <span className={`text-[10px] sm:text-xs font-bold uppercase tracking-wider ${
                 currentPokemon.id === poke.id ? 'text-white' : 'text-slate-500 group-hover:text-slate-300'
               }`}>
                 {poke.name}

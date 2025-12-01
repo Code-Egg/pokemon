@@ -1,3 +1,4 @@
+
 export interface Pokemon {
   id: number;
   name: string;
@@ -9,10 +10,10 @@ export interface Pokemon {
 
 export interface PuzzleState {
   gridSize: number;
-  tiles: number[]; // Array containing tile IDs. The value (gridSize*gridSize - 1) is the empty slot.
+  board: (number | null)[]; // Array of tile IDs placed on the board. null means empty slot.
+  bank: number[]; // Array of tile IDs currently in the bank/tray.
   isSolved: boolean;
-  moves: number;
   isPlaying: boolean;
 }
 
-export type GridSize = 3 | 4 | 5;
+export type GridSize = 3 | 4 | 5 | 8;

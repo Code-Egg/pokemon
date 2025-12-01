@@ -1,71 +1,73 @@
-import React from 'react';
+import React, { forwardRef } from 'react';
 import { Tile } from './Tile';
 import { PuzzleState } from '../types';
-import { getValidMoveTarget } from '../utils/puzzle';
 
 interface BoardProps {
   state: PuzzleState;
   imageUrl: string;
   color: string;
-  onMove: (newTiles: number[]) => void;
+  showHint: boolean;
+  onTileDrop: (tileId: number, point: { x: number; y: number }) => void;
 }
 
-export const Board: React.FC<BoardProps> = ({ state, imageUrl, color, onMove }) => {
-  const { tiles, gridSize, isSolved } = state;
-
-  const handleTileClick = (index: number) => {
-    if (isSolved) return;
-
-    // Check if move is valid
-    const emptyIndex = getValidMoveTarget(tiles, index, gridSize);
-    
-    if (emptyIndex !== -1) {
-      // Create new array copy
-      const newTiles = [...tiles];
-      // Swap
-      [newTiles[index], newTiles[emptyIndex]] = [newTiles[emptyIndex], newTiles[index]];
-      onMove(newTiles);
-    }
-  };
+export const Board = forwardRef<HTMLDivElement, BoardProps>(({ state, imageUrl, color, showHint, onTileDrop }, ref) => {
+  const { board, gridSize, isSolved } = state;
 
   return (
-    <div 
-      className="relative w-full max-w-md aspect-square bg-slate-800/50 p-2 rounded-xl border border-slate-700 shadow-2xl backdrop-blur-sm"
-    >
+    <div className="relative w-full max-w-md aspect-square p-2 rounded-xl border border-slate-700 shadow-2xl backdrop-blur-sm transition-all">
+      
+      {/* Ghost Image Background */}
       <div 
-        className="grid w-full h-full gap-1"
+        className={`absolute inset-2 rounded-lg pointer-events-none filter grayscale transition-opacity duration-500 ${showHint ? 'opacity-20' : 'opacity-0'}`}
+        style={{
+          backgroundImage: `url(${imageUrl})`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center'
+        }}
+      />
+
+      {/* Grid */}
+      <div 
+        key={gridSize}
+        ref={ref}
+        className="grid w-full h-full gap-1 relative z-10"
         style={{ 
           gridTemplateColumns: `repeat(${gridSize}, 1fr)`,
           gridTemplateRows: `repeat(${gridSize}, 1fr)`
         }}
       >
-        {tiles.map((tileId, index) => {
-          const isEmpty = tileId === (gridSize * gridSize - 1);
+        {board.map((tileId, index) => {
           return (
-            <Tile
-              key={tileId} // Key by ID to let framer-motion handle the position animation
-              id={tileId}
-              index={index}
-              gridSize={gridSize}
-              imageUrl={imageUrl}
-              color={color}
-              isEmpty={isEmpty}
-              isSolved={isSolved}
-              onClick={() => handleTileClick(index)}
-            />
+            <div 
+              key={index}
+              className="w-full h-full relative rounded-md border border-white/5 bg-slate-800/30"
+            >
+              {tileId !== null && (
+                <Tile
+                  id={tileId}
+                  gridSize={gridSize}
+                  imageUrl={imageUrl}
+                  color={color}
+                  isSolved={isSolved}
+                  onDragEnd={onTileDrop}
+                />
+              )}
+            </div>
           );
         })}
       </div>
       
       {isSolved && (
-        <div className="absolute inset-0 z-10 flex items-center justify-center pointer-events-none">
-          <div className="bg-black/60 absolute inset-0 rounded-xl" />
-          <div className="bg-white text-slate-900 px-6 py-4 rounded-2xl shadow-xl transform animate-bounce z-20 text-center">
-            <p className="text-2xl font-bold mb-1">Excellent!</p>
-            <p className="text-sm text-slate-600">Puzzle Complete</p>
+        <div className="absolute inset-0 z-50 flex items-center justify-center pointer-events-none animate-in fade-in duration-700">
+          <div className="bg-black/40 absolute inset-0 rounded-xl backdrop-blur-[2px]" />
+          <div className="bg-white text-slate-900 px-8 py-6 rounded-3xl shadow-2xl transform animate-bounce z-50 text-center border-4 border-yellow-400">
+            <p className="text-4xl font-black mb-2 text-yellow-500 drop-shadow-sm">GREAT JOB!</p>
+            <p className="text-base font-bold text-slate-600">Puzzle Solved!</p>
           </div>
         </div>
       )}
     </div>
   );
-};
+});
+
+Board.displayName = "Board";

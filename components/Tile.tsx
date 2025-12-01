@@ -3,33 +3,23 @@ import { motion } from 'framer-motion';
 
 interface TileProps {
   id: number;
-  index: number;
   gridSize: number;
   imageUrl: string;
   color: string;
-  isEmpty: boolean;
-  onClick: () => void;
   isSolved: boolean;
+  isInBank?: boolean;
+  onDragEnd: (id: number, point: { x: number; y: number }) => void;
 }
 
 export const Tile: React.FC<TileProps> = ({
   id,
-  index,
   gridSize,
   imageUrl,
   color,
-  isEmpty,
-  onClick,
   isSolved,
+  isInBank = false,
+  onDragEnd,
 }) => {
-  // If the puzzle is solved, we fill the empty slot (usually the last piece)
-  // to complete the image.
-  const showTile = !isEmpty || isSolved;
-
-  if (!showTile) {
-    return <div className="w-full h-full" />;
-  }
-
   // Calculate the background position based on the tile's ORIGINAL position (id)
   const originalRow = Math.floor(id / gridSize);
   const originalCol = id % gridSize;
@@ -39,24 +29,24 @@ export const Tile: React.FC<TileProps> = ({
   const bgPosY = originalRow * percentage;
 
   return (
-    <motion.button
-      layout
-      transition={{ type: "spring", stiffness: 300, damping: 25 }}
-      onClick={onClick}
-      // Apply the color class (e.g., bg-yellow-400) directly to the button
-      className={`relative w-full h-full overflow-hidden rounded-md shadow-sm border border-white/20 hover:brightness-110 active:scale-95 transition-all ${color} ${isEmpty && isSolved ? 'opacity-100' : ''}`}
+    <motion.div
+      layoutId={`tile-${gridSize}-${id}`}
+      className={`relative rounded-md shadow-[0_2px_4px_rgba(0,0,0,0.3)] border border-white/20 touch-none overflow-hidden ${color} ${isInBank ? 'w-16 h-16 sm:w-20 sm:h-20 shrink-0' : 'w-full h-full'}`}
+      drag={!isSolved}
+      dragMomentum={false}
+      dragElastic={0.1}
+      whileDrag={{ scale: 1.1, zIndex: 100, cursor: 'grabbing', opacity: 0.9 }}
+      whileHover={{ scale: isSolved ? 1 : 1.05, zIndex: 10 }}
+      onDragEnd={(_, info) => onDragEnd(id, info.point)}
       style={{
-        // Use backgroundImage instead of background to allow the CSS class background-color to show through
         backgroundImage: `url(${imageUrl})`,
-        backgroundSize: `${gridSize * 100}%`,
+        backgroundSize: `${gridSize * 100}%`, 
         backgroundPosition: `${bgPosX}% ${bgPosY}%`,
         backgroundRepeat: 'no-repeat',
-        zIndex: isEmpty ? 0 : 1
+        zIndex: 1
       }}
-      disabled={isSolved && !isEmpty}
     >
-        {/* Optional: Number overlay for easier debugging/playing, can be toggled if we added a setting */}
-        {/* <span className="absolute top-1 left-1 text-xs font-bold text-white drop-shadow-md bg-black/30 rounded px-1">{id + 1}</span> */}
-    </motion.button>
+       {!isSolved && <div className="absolute inset-0 bg-white/0 hover:bg-white/10 transition-colors pointer-events-none" />}
+    </motion.div>
   );
 };
